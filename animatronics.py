@@ -5,6 +5,127 @@ import threading
 
 from time import sleep
 from pygame import mixer
+from enum import Enum
+
+class Language(Enum):
+    ENG = "English"
+    SPA = "Spanish"
+    NONE = "None"
+
+class Animatronic(self):
+
+    def __init__:
+        # Initialize GPIO
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setwarnings(False)
+
+        # Hydraulics GPIO pins
+        GPIO.setup(20,GPIO.OUT)
+        GPIO.setup(21,GPIO.OUT)
+        GPIO.output(21, GPIO.HIGH)
+
+        # Lights GPIO pins
+        GPIO.setup(13,GPIO.OUT)
+        GPIO.setup(19,GPIO.OUT)
+
+        # Mouth (servo) GPIO pin
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(26, GPIO.OUT)
+        p = GPIO.PWM(26,100)
+
+        # Head (servo) GPIO pin
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(4, GPIO.OUT)
+        p2 = GPIO.PWM(4,100)
+        
+        # Arm (servo) GPIO pin
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(5, GPIO.OUT)
+        p3 = GPIO.PWM(5,100)
+
+        # Back-toggle-switch GPIO pin
+        #
+        # - To be implemented in the future
+        #
+        GPIO.setup(16, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+
+        # Instance variables
+
+        # Testing mode
+        self.testing_mode = False
+
+        # Language mode
+        self.lang = Language.NONE
+
+        # Motor counter variable
+        self.motor_time = 0.0
+
+        # Time (in secs) for sleep mode
+        self.sleep_threshold = 10
+        
+        # Hydraulics motor state
+        motor_state = GPIO.LOW
+
+        # Light 1 status
+        self.light_one_status = GPIO.LOW
+        
+        # Light 2 status
+        self.light_two_status = GPIO.LOW
+
+        # RFID Reader
+        self.reader = SimpleMFRC522.SimpleMFRC522()
+
+
+    # Hydraulic methods
+
+    def switch_motor_state(self):
+        if self.motor_state == GPIO.LOW:
+            GPIO.output(21, GPIO.HIGH)
+            self.motor_state = GPIO.HIGH
+            return
+        if self.motor_state == GPIO.HIGH:
+            GPIO.output(21, GPIO.LOW)
+            self.motor_state = GPIO.LOW
+            return
+
+    def switch_cylinder_direction():
+        global cylinder_direction
+        if cylinder_direction == GPIO.LOW:
+            GPIO.output(20, GPIO.HIGH)
+            cylinder_direction = GPIO.HIGH
+            return
+        if cylinder_direction == GPIO.HIGH:
+            GPIO.output(20, GPIO.LOW)
+            cylinder_direction = GPIO.LOW
+            return
+
+    # Light methods
+
+    def toggle_light_one(self):
+        if self.light_one_status == GPIO.LOW:
+            GPIO.output(13, GPIO.HIGH)
+            light_one_status = GPIO.HIGH
+            return
+        if light_one_status == GPIO.HIGH:
+            GPIO.output(13, GPIO.LOW)
+            light_one_status = GPIO.LOW
+            return
+
+    def toggle_light_two():
+        global light_two_status
+        if light_two_status == GPIO.LOW:
+            GPIO.output(19, GPIO.HIGH)
+            light_two_status = GPIO.HIGH
+            return
+        if light_two_status == GPIO.HIGH:
+            GPIO.output(19, GPIO.LOW)
+            light_two_status = GPIO.LOW
+            return
+
+# NOTE TO MYSELF: Study referencing in python to see if you can simplify the toggle_light_... methods to a single method that updates an instance variable given two parameters!
+
+
 
 class ThreadCounter:
     def __init__(self, interval = 1):
@@ -31,13 +152,13 @@ class ThreadCounter:
                     self.on = False
             time.sleep(self.interval)
 
+
+
 reader = SimpleMFRC522.SimpleMFRC522()
 
 # LED Status (ON)
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
-GPIO.setup(18,GPIO.OUT)
-GPIO.output(18,GPIO.HIGH)
 
 # Switch
 GPIO.setup(16, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -82,8 +203,8 @@ counter_thread = ThreadCounter()
 cylinder_direction = GPIO.LOW
 motor_state = GPIO.LOW
 
-l_1_state = GPIO.LOW
-l_2_state = GPIO.LOW
+light_one_status = GPIO.LOW
+light_two_status = GPIO.LOW
 
 def sleep_monkey():
     raise_ramp()
@@ -106,14 +227,14 @@ def sleep_voice():
     stop_mouth()
 
 def blinker():
-    l1()
-    l2()
+    toggle_light_one()
+    toggle_light_two()
     sleep(1)
-    l1()
-    l2()
+    toggle_light_one()
+    toggle_light_two()
     sleep(1)
-    l1()
-    l2()
+    toggle_light_one()
+    toggle_light_two()
 
 def play_background():
     print "RUNNING BACKGROUND"
@@ -131,8 +252,8 @@ def set_lang(text):
     lang = text
     stop_background()
     move_mouth()
-    l1()
-    l2()
+    toggle_light_one()
+    toggle_light_two()
     playSong("intro_" + lang, False)
     sleep(7)
     stop_mouth()
@@ -198,26 +319,26 @@ def stopSong(fadeout_time):
     mixer.quit()
 
 
-def l1():
-    global l_1_state
-    if l_1_state == GPIO.LOW:
+def toggle_light_one():
+    global light_one_status
+    if light_one_status == GPIO.LOW:
         GPIO.output(13, GPIO.HIGH)
-        l_1_state = GPIO.HIGH
+        light_one_status = GPIO.HIGH
         return
-    if l_1_state == GPIO.HIGH:
+    if light_one_status == GPIO.HIGH:
         GPIO.output(13, GPIO.LOW)
-        l_1_state = GPIO.LOW
+        light_one_status = GPIO.LOW
         return
 
-def l2():
-    global l_2_state
-    if l_2_state == GPIO.LOW:
+def toggle_light_two():
+    global light_two_status
+    if light_two_status == GPIO.LOW:
         GPIO.output(19, GPIO.HIGH)
-        l_2_state = GPIO.HIGH
+        light_two_status = GPIO.HIGH
         return
-    if l_2_state == GPIO.HIGH:
+    if light_two_status == GPIO.HIGH:
         GPIO.output(19, GPIO.LOW)
-        l_2_state = GPIO.LOW
+        light_two_status = GPIO.LOW
         return
 
 
@@ -344,13 +465,13 @@ def runTagLoop():
                 switch_cylinder_direction()
             elif input == "exit":
                 testing = False
-            elif input == "l1":
-                l1()
-            elif input == "l2":
-                l2()
+            elif input == "toggle_light_one()":
+                toggle_light_one()
+            elif input == "toggle_light_two()":
+                toggle_light_two()
             elif input == "lall":
-                l1()
-                l2()
+                toggle_light_one()
+                toggle_light_two()
             elif input == "m1":
                 move_mouth()
             elif input == "m2":
