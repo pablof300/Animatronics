@@ -1,7 +1,7 @@
 # Orangutan Animatronics
 
 
-This project was created as an animatronic competition project for the **2018 Technology Student Association Florida State conference**. This competition tasked a group of engineers to *"create an interactive animatronic robot for a local Zoo or aquarium"*. We created Dylan: **an interactive RFID-capable hydraulic powered orangutan that raises awareness about his specie and its environment through speech**.
+This project was created as an animatronic competition project for the **2018 Technology Student Association Florida State conference**. This competition tasked a group of engineers to *"create an interactive animatronic robot for a local Zoo or aquarium"*. We created Dylan: **an interactive RFID-capable hydraulic powered orangutan** that raises awareness about his specie and its environment through speech.
 
 #### Meet him:
 ![alt text](https://github.com/pablof300/Orangutan-Animatronic/blob/master/images/image_one.png?raw=true)
@@ -59,7 +59,7 @@ Some of the black thicker cables seen in the picture are for the power supply an
 
 ![alt text](https://github.com/pablof300/Orangutan-Animatronic/blob/master/images/image_seven.jpg?raw=true)
 
-We use the [SimpleMFRC522](http://github.com) class written by Simon Monk to interface with the RFID sensor (RFID RC522). To use this class, you must have installed the SPI-Py library. Before doing any of this, you must have Python installed.
+We use the [SimpleMFRC522](https://github.com/pablof300/Orangutan-Animatronic/blob/master/source-code/SimpleMFRC522.py) class written by Simon Monk to interface with the RFID sensor (RFID RC522). To use this class, you must have installed the SPI-Py library. Before doing any of this, you must have Python installed.
 ```
 $ git clone https://github.com/lthiery/SPI-Py.git
 $ sudo python setup.py install
@@ -69,7 +69,7 @@ You can ge the SimpleMFRC522 class here:
 git clone https://github.com/pimylifeup/MFRC522-python.git
 ```
 
-All of our code was run using a Raspberry Pi Model B using the OS Raspbian. I wrote all of our source code in the [animatronics.py](http://github.com) file. Within our source folder, you will also find several mp3 files that contain the facts the speaker plays when prompted by an RFID tag.
+All of our code was run using a Raspberry Pi Model B using the OS Raspbian. I wrote all of our source code in the [animatronics.py](https://github.com/pablof300/Orangutan-Animatronic/blob/master/source-code/animatronics.py) file. Within our source folder, you will also find several mp3 files that contain the facts the speaker plays when prompted by an RFID tag.
 
 # License
 
